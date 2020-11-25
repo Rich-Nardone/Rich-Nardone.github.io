@@ -260,7 +260,13 @@ def main():
 
 
 # =======================================================================================
+@app.route("/achievement_menu.html")
+def achievement_menu():
+    """ achievement menu page """
+    return flask.render_template("achievement_menu.html")
 
+
+# =======================================================================================
 # RUNS ON THIS HOST AND PORT
 if __name__ == "__main__":
     socketio.run(
