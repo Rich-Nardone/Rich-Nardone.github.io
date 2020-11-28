@@ -15,14 +15,21 @@ const h1={
 
 function Achievements(){
     const[title, setTitle] = useState('Click an Achievement to view your progress'); 
-    const[progress, setProgress] = useState(''); 
+    const[progress, setProgress] = useState('');
+    function retrieve_achievement(id){
+        console.log('Asking server for achievement stats for '+id);
+        Socket.emit('get achievement');
+        Socket.on('achievement', (data)=>{
+                setTitle(data['title']);
+                setProgress(data['progress']);
+        }); 
+        console.log('Received achievement stats from server for '+ id);
+    }
     function handleClick(event){
         event.preventDefault();
-        console.log(event);
-        Socket.emit('get achievement');
-        
+        console.log('Setting stats for the achievement '+event.target.id);
+        retrieve_achievement(event.target.id);
     }
-    
     return(
             <div>
                 <h1 style={h1}>Achievement Menu</h1>

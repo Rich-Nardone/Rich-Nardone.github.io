@@ -230,7 +230,18 @@ def item_purchased():
     
     
     
-
+@socketio.on("get achievement")
+def get_achievement():
+    """ get achievement """
+    #TODO get achievements from database
+    
+    #DUMMY DATA
+    achievement={
+            "title": 'heist',
+            'description':"indepth description of how to make progress in achievement",
+            "progress": 15
+    }
+    socketio.emit('achievement', achievement)
 
 @socketio.on("user new character")
 def character_creation(data):
