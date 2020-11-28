@@ -8,7 +8,7 @@ import {Socket} from './Socket.jsx';
 export function MainUI(){
     return(
         <div>
-            <AchievementButton/>
+            <AchievementButton />
             <PartyList /> 
             <InventoryList />
             <Chatbox /> 
