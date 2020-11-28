@@ -14,10 +14,8 @@ const h1={
 
 
 function Achievements(){
-    const[charName, setName] = useState(''); 
-    const[gender, setGender] = useState(''); 
-    const[charClass, setCharClass] = useState('');
-    
+    const[title, setTitle] = useState('Click an Achievement to view your progress'); 
+    const[progress, setProgress] = useState(''); 
     function handleClick(event,id){
         event.preventDefault();
         let achievement_id = {
@@ -26,13 +24,14 @@ function Achievements(){
         console.log(achievement_id);
         console.log(id);
         Socket.emit('get achievement', achievement_id);
-        return(window.location = "main_chat.html")
         
     }
     
     return(
         <div>
             <h1 style={h1}>Achievement Menu</h1>
+            <h2> { title } </h2>
+            <h3> { progress } </h3>
             <br></br>
             <button id='money' onClick={handleClick(this.id)}>heist</button>
             <br></br>

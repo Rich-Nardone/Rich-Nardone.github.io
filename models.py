@@ -44,13 +44,13 @@ class inventory(db.Model):
     character_id = db.Column(db.Integer, db.ForeignKey("character.id"))
     items = db.Column(db.String(400))
 
-class achievements(db.Model):
-    """ Stores users achievements info """
-    __tablename__ = 'achievements'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("username.id"))
-    games_won = db.Column(db.Integer)
-    damage_dealt = db.Column(db.Integer)
-    items_bought = db.Column(db.Integer)
-    money = db.Column(db.Integer)
-    health_regen = db.Column(db.Integer)
+# class achievements(db.Model):
+#     """ Stores users achievements info """
+#     __tablename__ = 'achievements'
+#     id = db.Column(db.Integer, primary_key=True)
+#     user_id = db.Column(db.Integer, db.ForeignKey("username.id"))
+#     games_won = db.Column(db.Integer)
+#     damage_dealt = db.Column(db.Integer)
+#     items_bought = db.Column(db.Integer)
+#     money = db.Column(db.Integer)
+#     health_regen = db.Column(db.Integer)
