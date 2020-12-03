@@ -230,17 +230,38 @@ def item_purchased():
     
     
     
-@socketio.on("get achievement")
+@socketio.on("get achievements")
 def get_achievement():
-    """ get achievement """
+    """ get achievements """
     #TODO get achievements from database
     
     #DUMMY DATA
-    achievement={
-            "title": 'heist',
-            'description':"indepth description of how to make progress in achievement",
-            "progress": 15
-    }
+    achievement=[
+        [
+            'money',
+            'Money Laundering',
+            'Be on the look out for money. Collect $100 to claim a valueable reward',
+            '50',
+            '100',
+            '0'
+        ],
+        [
+            'wins',
+            'King with the Crowns',
+            'Reach the final end state three times to claim your custom prize',
+            '1',
+            '3',
+            '0'
+        ],
+        [
+            'items',
+            'Luxury at its finest',
+            'collect one item to claim your custom prize',
+            '1',
+            '1',
+            '1'
+        ]
+    ]
     socketio.emit('achievement', achievement)
 
 @socketio.on("user new character")
