@@ -90,6 +90,7 @@ def saveProgress():
             FLAG = "INSERT"
 
     if FLAG == "INSERT":
+        init_achievements()
         chara = models.character(
             user_id=USER,
             character_name=statslist[0],
@@ -134,7 +135,7 @@ def saveProgress():
     else:
         print("weird error")
 
-
+    
 userlist = [1]
 
 
@@ -227,39 +228,82 @@ def item_purchased():
     inventory = get_user_inventory()
     inventory.append('health pack')
     send_inventory(inventory)
-    
-    
+
+
+def init_achievements():
+    USER = userlist[-1]
+    email = db.session.query(models.username).filter_by(id=USER).first()
+    userid = email.id
+    achievements = models.achievements(
+        user_id=userid,
+        win_id='wins',
+        win_title='King of the land',
+        win_description='Reach the final end state three times to claim your custom prize.',
+        wins='0',
+        win_f='3',
+        win_prize = '0',
+        damage_id = 'damage',
+        damage_title = 'Soul Seeker',
+        damage_description = 'Deal damage to your oppenents in battle. Deal 300 points of damage to claim a valueable reward.',
+        damage_dealt = '0',
+        damage_f = '300',
+        damage_prize = '0',
+        items_id = 'items',
+        item_title = 'Living Lavish',
+        item_description = 'Find items around the map or buy items from the shop. Obtain 2 items to claim a valueable reward.',
+        items = '0',
+        item_f = '2',
+        item_prize = '0',
+        money_id = 'money',
+        money_title = 'Money Laundering',
+        money_description = 'Be on the look out for money. Collect $300 to claim a valueable reward.',
+        moneys = '0',
+        money_f = '300',
+        money_prize = '0'
+    )
+    db.session.add(achievements)
+    db.session.commit()
     
 @socketio.on("get achievements")
 def get_achievement():
     """ get achievements """
     #TODO get achievements from database
-    
-    #DUMMY DATA
+    USER = userlist[-1]
+    email = db.session.query(models.username).filter_by(id=USER).first()
+    userid = email.id
+    a_info = (db.session.query(models.achievements).filter_by(user_id=userid).first())
     achievement=[
         [
-            'money',
-            'Money Laundering',
-            'Be on the look out for money. Collect $100 to claim a valueable reward',
-            '50',
-            '100',
-            '0'
+            a_info.win_id,
+            a_info.win_title,
+            a_info.win_description,
+            a_info.wins,
+            a_info.win_f,
+            a_info.win_prize
         ],
         [
-            'wins',
-            'King with the Crowns',
-            'Reach the final end state three times to claim your custom prize',
-            '1',
-            '3',
-            '0'
+            a_info.damage_id,
+            a_info.damage_title,
+            a_info.damage_description,
+            a_info.damage_dealt,
+            a_info.damage_f,
+            a_info.damage_prize
         ],
         [
-            'items',
-            'Luxury at its finest',
-            'collect one item to claim your custom prize',
-            '1',
-            '1',
-            '1'
+            a_info.items_id,
+            a_info.item_title,
+            a_info.item_description,
+            a_info.items,
+            a_info.item_f,
+            a_info.item_prize
+        ],
+        [
+            a_info.money_id,
+            a_info.money_title,
+            a_info.money_description,
+            a_info.moneys,
+            a_info.money_f,
+            a_info.money_prize
         ]
     ]
     socketio.emit('achievement', achievement)

@@ -44,13 +44,32 @@ class inventory(db.Model):
     character_id = db.Column(db.Integer, db.ForeignKey("character.id"))
     items = db.Column(db.String(400))
 
-# class achievements(db.Model):
-#     """ Stores users achievements info """
-#     __tablename__ = 'achievements'
-#     id = db.Column(db.Integer, primary_key=True)
-#     user_id = db.Column(db.Integer, db.ForeignKey("username.id"))
-#     games_won = db.Column(db.Integer)
-#     damage_dealt = db.Column(db.Integer)
-#     items_bought = db.Column(db.Integer)
-#     money = db.Column(db.Integer)
-#     health_regen = db.Column(db.Integer)
+class achievements(db.Model):
+    """ Stores users achievements info """
+    __tablename__ = 'achievements'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("username.id"))
+    win_id = db.Column(db.String(400))
+    win_title = db.Column(db.String(400))
+    win_description = db.Column(db.String(400))
+    wins = db.Column(db.String(400))
+    win_f = db.Column(db.String(400))
+    win_prize = db.Column(db.String(400))
+    damage_id = db.Column(db.String(400))
+    damage_title = db.Column(db.String(400))
+    damage_description = db.Column(db.String(400))
+    damage_dealt = db.Column(db.String(400))
+    damage_f = db.Column(db.String(400))
+    damage_prize = db.Column(db.String(400))
+    items_id = db.Column(db.String(400))
+    item_title = db.Column(db.String(400))
+    item_description = db.Column(db.String(400))
+    items = db.Column(db.String(400))
+    item_f = db.Column(db.String(400))
+    item_prize = db.Column(db.String(400))
+    money_id = db.Column(db.String(400))
+    money_title = db.Column(db.String(400))
+    money_description = db.Column(db.String(400))
+    moneys = db.Column(db.String(400))
+    money_f = db.Column(db.String(400))
+    money_prize = db.Column(db.String(400))
