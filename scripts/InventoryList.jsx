@@ -1,14 +1,19 @@
 //Displayes inventory list. Inventory list is retrieved from database
-import React, {useState, useEffect} from 'react'; 
-import {Socket} from './Socket.jsx'; 
+import React, {useState, useEffect} from 'react';
+import {Socket} from './Socket.jsx';
+import PropTypes from 'prop-types';
+import {fnt} from './OptionMenu.jsx';
+import {brc} from './OptionMenu.jsx';
+
 
 
 
 const div={
-    width:200,
+    width:205,
     height: 200,
     background:'orange',
-    border:'3px solid black',
+    border:brc,
+    
     
     
 };
@@ -16,9 +21,10 @@ const p={
     padding:'auto',
     margin:10,
     position: 'relative',
-    border:'2px solid black',
+    border:brc,
     fontWeight:'bold',
     textAlign:'center',
+    fontSize:fnt,
     
 };
 const ul={
@@ -26,8 +32,23 @@ const ul={
     textAlign:'left',
     overflow: 'scroll',
     fontStyle:'italic',
+    padding:0,
+    fontSize:fnt,
    
 };
+
+const list_style={
+    borderRadius:5,
+    border:brc,
+    textAlign:'center',
+    fontWeight:'bold',
+    padding:2,
+    margin:3,
+    fontSize:fnt,
+    
+    
+}
+
 
 export function InventoryList(props){
     const[inventory, setInventory] = useState([]);
@@ -41,8 +62,8 @@ export function InventoryList(props){
         }, []);    
     }
     
-    const display_inventory = inventory.map((items,index)=>
-        <li key={index}> {items} </li>
+    const display_inventory = inventory.map((inventory,index)=>
+        <li key={index}> {inventory} </li>
     );
     
     retrieve_player_inventory();

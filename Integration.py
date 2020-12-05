@@ -3,54 +3,31 @@
 """
 import os
 from os.path import join, dirname
-import flask
-import flask_sqlalchemy
-import flask_socketio
-from dotenv import load_dotenv
-
-# local imports
+from settings import db, app, socketio
 import models
-
+import flask
 # tests
+
 # game logic
 import game.game
 import game.game_io
 from game.game import game
 from game.game_io import deconstruct_player
 from game.player import Player
-import user_input
 
 # For shop, checks if item has been purchased.
 item = 0
 # Used to check if user bought item again.
 times = 1
 
-app = flask.Flask(__name__)
-
-
-socketio = flask_socketio.SocketIO(app)
-socketio.init_app(app, cors_allowed_origins="*")
-
-dotenv_path = join(dirname(__file__), "sql.env")
-load_dotenv(dotenv_path)
-
-database_uri = os.environ["DATABASE_URL"]
-app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
-
-db = flask_sqlalchemy.SQLAlchemy(app)
-db.init_app(app)
-db.app = app
 
 # ===================================================================================
 
-# user input object
-user_in = user_input.UserInput()
-
 # For shop, checks if item has been purchased.
 item = 0
 # Used to check if user bought item again.
 times = 1
-# please
+#plesae
 
 # function that marks and saves progress,
 #  either inserting a new character into database or updating an existing one.
@@ -135,9 +112,33 @@ def saveProgress():
     else:
         print("weird error")
 
-    
-userlist = [1]
+def player_info():
+    """ Send playerinfo to js. Currently sends dummy data. """
+    player_info = {
+        "user_party": ["player1", "player2", "player10"],
+        "user_inventory": ["coins", "sword", "shield"],
+        "user_chatlog": [
+            "welcome to the world",
+            "attack",
+            "user attacks, hitting the blob for 10pts",
+        ],
+    }
+    if item == 1:
+        x = player_info["user_inventory"]
+        global times
+        if times == 0:
+            x.extend(["Health Pack"])
+            times += 1
+        else:
+            x.extend(["Health Pack"] * times)
+            times += 1
 
+        print(x)
+        player_info["user_inventory"] = x
+    socketio.emit("player info", player_info)
+
+
+userlist = [1]
 
 @socketio.on("google login")
 def google_login(data):
@@ -153,11 +154,11 @@ def google_login(data):
         db.session.commit()
     userid = db.session.query(models.username).filter_by(email=em).first()
     userlist.append(userid.id)
-    
+
     #Used to distinguish users, for database user calls 
-    flask.session['user_id'] = userid
-    flask.session['socket_id'] = flask.request.sid
+    flask.session["user_id"] = em
     
+    #check if user has character
     
 def send_party(): 
     #TODO get party from database 
@@ -166,18 +167,22 @@ def send_party():
     user_party=["player1", "player2", "player10"]
     socketio.emit('user party', user_party)
 
-def send_inventory(inventory):
-    socketio.emit('user inventory', inventory)
 
 def get_user_inventory(): 
     #TODO get log from database
-    
-    #DUMMY DATA
-    return([
-            "coins",
-            "shield",
-            "sword"
-    ])
+    if "user_id" in flask.session:
+        items = []
+        for x, a, i in models.db.session.query(models.username, models.character, models.inventory).\
+        filter(models.username.email == flask.session["user_id"]).\
+        filter(models.character.user_id == models.username.id).\
+        filter(models.inventory.character_id == models.character.id):
+                items.append(i.items)
+        
+        return items
+    else: 
+        return([
+            "error",    #replace this with error
+        ])
     
 def send_chatlog():
     #TODO get chatlog from database
@@ -190,12 +195,12 @@ def send_chatlog():
     ]
     socketio.emit('user chatlog', user_chatlog)
 
-    
 @socketio.on("user input")
 def parse_user_input(data):
     """ Parse user inputs in order to interact with game logic """
-    print(data["input"])
-    user_in.update(data["input"])
+    print(
+        data["input"]
+    )
 
 
 @socketio.on("get party")
@@ -204,6 +209,7 @@ def get_party():
     
 @socketio.on("get inventory")
 def get_inventory():
+    print(flask.session["user_id"])
     inventory = get_user_inventory()
     send_inventory(inventory)
 
@@ -219,16 +225,53 @@ def get_chatlog():
     ]
     send_chatlog()
 
+
 # Test atm for the shop
 @socketio.on("item purchased")
 def item_purchased():
     """ Purchase item """
     global item
     item = 1
-    inventory = get_user_inventory()
-    inventory.append('health pack')
-    send_inventory(inventory)
+    player_info()
 
+
+
+@socketio.on("user new character")
+def character_creation(data):
+    """ Create character """
+    player = Player()
+    player.id = data["name"]
+    player.gen = data["gen"]
+    player.character_class = data["classType"]
+    # data includes character attributes: name, gender and character class
+    if data["classType"] == "Jock":
+        player.make_jock()
+    elif data["classType"] == "Bookworm":
+        player.make_bookworm()
+    elif data["classType"] == "NEET":
+        player.make_neet()
+    USER = userlist[-1]
+    email = db.session.query(models.username).filter_by(id=USER).first()
+    userid = email.id
+    dbplayer = models.character(
+        user_id=userid,
+        character_class=data["classType"],
+        character_name=data["name"],
+        gender=data["gen"],
+        strength=player.strength,
+        dex=player.dex,
+        con=player.con,
+        intel=player.intel,
+        cha=player.cha,
+        luck=player.luk,
+        max_health=player.max_health,
+        health=player.health,
+        max_mana=player.max_mana,
+        mana=player.mana,
+        money=player.money,
+    )
+    db.session.add(dbplayer)
+    db.session.commit()
 
 def init_achievements():
     USER = userlist[-1]
@@ -307,51 +350,18 @@ def get_achievement():
         ]
     ]
     socketio.emit('achievement', achievement)
-
-@socketio.on("user new character")
-def character_creation(data):
-    """ Create character """
-    player = Player()
-    player.id = data["name"]
-    player.gen = data["gen"]
-    player.character_class = data["classType"]
-    # data includes character attributes: name, gender and character class
-    if data["classType"] == "Jock":
-        player.make_jock()
-    elif data["classType"] == "Bookworm":
-        player.make_bookworm()
-    elif data["classType"] == "NEET":
-        player.make_neet()
-    USER = userlist[-1]
-    email = db.session.query(models.username).filter_by(id=USER).first()
-    userid = email.id
-    dbplayer = models.character(
-        user_id=userid,
-        character_class=data["classType"],
-        character_name=data["name"],
-        gender=data["gen"],
-        strength=player.strength,
-        dex=player.dex,
-        con=player.con,
-        intel=player.intel,
-        cha=player.cha,
-        luck=player.luk,
-        max_health=player.max_health,
-        health=player.health,
-        max_mana=player.max_mana,
-        mana=player.mana,
-        money=player.money,
-    )
-    db.session.add(dbplayer)
-    db.session.commit()
-
-
+    
 # ======================================================================================
 @app.route("/")
+def about():
+    """ main page """
+    return flask.render_template("landing_page.html")
+
+#=======================================================================================
+@app.route("/login.html")
 def index():
     """ main page """
     return flask.render_template("index.html")
-
 
 # ======================================================================================
 @app.route("/character_creation.html")
@@ -366,6 +376,14 @@ def main():
     """ main chat window """
     saveProgress()
     return flask.render_template("main_chat.html")
+    
+
+#=========================================================================================
+@app.route("/options.html")
+def options():
+    """ main chat window """
+    #saveProgress()
+    return flask.render_template("options.html")
 
 
 # =======================================================================================
@@ -376,11 +394,12 @@ def achievement_menu():
 
 
 # =======================================================================================
+
 # RUNS ON THIS HOST AND PORT
 if __name__ == "__main__":
     socketio.run(
         app,
         host=os.getenv("IP", "0.0.0.0"),
         port=int(os.getenv("PORT", 8080)),
-        debug=True,
+        debug=True
     )
