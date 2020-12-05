@@ -212,7 +212,10 @@ def get_inventory():
     print(flask.session["user_id"])
     inventory = get_user_inventory()
     send_inventory(inventory)
-
+    
+def send_inventory(inventory):
+    socketio.emit('user inventory', inventory)
+    
 @socketio.on("get chatlog")
 def get_chatlog():
     #TODO get chatlog from database
