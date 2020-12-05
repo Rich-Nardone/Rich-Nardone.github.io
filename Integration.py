@@ -14,13 +14,6 @@ import game.game_io
 from game.game import game
 from game.game_io import deconstruct_player
 from game.player import Player
-
-# For shop, checks if item has been purchased.
-item = 0
-# Used to check if user bought item again.
-times = 1
-
-
 # ===================================================================================
 
 # For shop, checks if item has been purchased.
@@ -173,11 +166,10 @@ def get_user_inventory():
     if "user_id" in flask.session:
         items = []
         for x, a, i in models.db.session.query(models.username, models.character, models.inventory).\
-        filter(models.username.email == flask.session["user_id"]).\
-        filter(models.character.user_id == models.username.id).\
-        filter(models.inventory.character_id == models.character.id):
-                items.append(i.items)
-        
+            filter(models.username.email == flask.session["user_id"]).\
+            filter(models.character.user_id == models.username.id).\
+            filter(models.inventory.character_id == models.character.id):
+                    items.append(i.items)
         return items
     else: 
         return([
@@ -236,8 +228,8 @@ def item_purchased():
     global item
     item = 1
     player_info()
-
-
+    update_achievements('item')
+    
 
 @socketio.on("user new character")
 def character_creation(data):
@@ -276,6 +268,27 @@ def character_creation(data):
     db.session.add(dbplayer)
     db.session.commit()
 
+
+def update_achievements(key):
+    if(key == 'item'):
+        USER = userlist[-1]
+        email = db.session.query(models.username).filter_by(id=USER).first()
+        userid = email.id
+        a_info = (db.session.query(models.achievements).filter_by(user_id=userid).first())
+        if(a_info.items < a_info.item_f):
+            hold = int(a_info.items)+1
+            a_info.items = str(hold)
+            db.session.commit()
+            if(a_info.items == a_info.item_f):
+                a_info.item_prize = '1'
+                db.session.commit()
+    elif(key == 'win'):
+        pass
+    elif(key == 'damage'):
+        pass
+    elif(key == 'money'):
+        pass
+    
 def init_achievements():
     USER = userlist[-1]
     email = db.session.query(models.username).filter_by(id=USER).first()
@@ -302,9 +315,9 @@ def init_achievements():
         item_prize = '0',
         money_id = 'money',
         money_title = 'Money Laundering',
-        money_description = 'Be on the look out for money. Collect $300 to claim a valueable reward.',
+        money_description = 'Be on the look out for money. Collect $20 to claim a valueable reward.',
         moneys = '0',
-        money_f = '300',
+        money_f = '20',
         money_prize = '0'
     )
     db.session.add(achievements)
@@ -313,7 +326,6 @@ def init_achievements():
 @socketio.on("get achievements")
 def get_achievement():
     """ get achievements """
-    #TODO get achievements from database
     USER = userlist[-1]
     email = db.session.query(models.username).filter_by(id=USER).first()
     userid = email.id
@@ -393,11 +405,11 @@ def options():
 @app.route("/achievement_menu.html")
 def achievement_menu():
     """ achievement menu page """
+    saveProgress()
     return flask.render_template("achievement_menu.html")
 
 
 # =======================================================================================
-
 # RUNS ON THIS HOST AND PORT
 if __name__ == "__main__":
     socketio.run(

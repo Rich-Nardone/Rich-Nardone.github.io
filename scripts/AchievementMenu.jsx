@@ -1,22 +1,71 @@
 import React, {useState} from 'react'; 
 import {Socket} from './Socket.jsx';
+import Typography from '@material-ui/core/Typography';
+import Sound from 'react-sound';
+import Grid from '@material-ui/core/Grid';
+import {fnt} from './OptionMenu.jsx';
+import {brc} from './OptionMenu.jsx';
 
 const h1={
+    
+    color:'white',
     textAlign: 'center',
     padding: 50,
     margin: 50,
     fontWeight: 'bold',
-    fontStyle: 'italic',
     borderWidth: 5,
-    background: 'linear-gradient(darkviolet,darkblue)',
+    background: 'grey',
     borderRadius:10,
+    
 };
-
+const div={
+    fontSize:fnt,
+    
+};
+const div2={
+    border:brc,
+    fontSize:fnt,
+    background:'grey',
+};
+const ul={
+    border:brc,
+    fontSize:fnt,
+    background:'black',
+};
+const BackButton={
+    textAlign:'center',
+    fontWeight:'bold',
+    fontStyle:'italic',
+    background: 'linear-gradient(green,green)',
+    padding: 5,
+    margin: 5,
+    border:brc,
+    borderRadius:10,
+    fontSize:fnt,
+    
+};
+const ClaimButton={
+    textAlign:'center',
+    fontWeight:'bold',
+    fontStyle:'italic',
+    background: 'linear-gradient(#e66465, #9198e5)',
+    padding: 5,
+    margin: 5,
+    border:brc,
+    borderRadius:10,
+    fontSize:fnt,
+    
+};
 
 function Achievements(){
     const[title, setTitle] = useState('Click an Achievement to view your progress'); 
     const[progress, setProgress] = useState('');
     const[achievements, setAchievements] = useState([]);
+    
+    function returnToMain(){
+        
+        return(window.location = "main_chat.html")
+    }
     
     function retrieve_achievement(){
         console.log('Asking server for achievement stats for player');
@@ -33,10 +82,11 @@ function Achievements(){
     );
     function format_achievement(array){
         const r = (
-               <details key={array[0]}>
-                    <summary>{array[1]}</summary>
-                    <p>{array[2]}</p>
-                    <label>Progress: {array[3]}/{array[4]}</label>
+               <details key={array[0]} style= {div}>
+                    <summary >{array[1]}</summary>
+                    <p >{array[2]}</p>
+                    <br></br>
+                    <label  >Progress: {array[3]}/{array[4]}</label>
                     <progress value={array[3]} max={array[4]}></progress>
                     {set_claim_achievement(array[5], array[0])}
                 </details>
@@ -45,10 +95,10 @@ function Achievements(){
     }
     function set_claim_achievement(flag, id){
         if (flag === '0'){
-            return <button id={id} onClick={handleClick} disabled>Finish mission to redeem</button>;
+            return <button id={id} style={ClaimButton} onClick={handleClick} disabled>Finish mission to redeem</button>;
         }
         else if (flag === '1'){
-            return <button id={id} onClick={handleClick}>Congrats! Collect your prize</button>;
+            return <button id={id} style={ClaimButton} onClick={handleClick}>Congrats! Collect your prize</button>;
         }
     }
     function handleClick(event){
@@ -58,13 +108,19 @@ function Achievements(){
     }
     retrieve_achievement();
     return(
-            <div>
+            <div style={ div }>
+                <Sound
+                    url='/static/Index_LoginTheme.mp3'
+                    playStatus={Sound.status.PLAYING}
+                    volume='50'
+                />
                 <h1 style={h1}>Achievement Menu</h1>
                 <h2> { title } </h2>
                 <h3> { progress } </h3>
-                <ul>
+                <ul style={div2}>
                     {display_achievements}
                 </ul>
+                <button style={ BackButton } onClick={returnToMain} >Exit Back to Main?</button>
             </div>
     );
 }

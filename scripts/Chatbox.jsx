@@ -3,6 +3,13 @@ import {Socket} from './Socket.jsx';
 import {fnt} from './OptionMenu.jsx';
 import {brc} from './OptionMenu.jsx';
 
+const button={
+    fontWeight:'bold',
+    fontStyle:'italic',
+    border:brc,
+    fontSize:fnt,
+    width:'100'
+}  
 
 const div={
     width:1000,
@@ -29,8 +36,12 @@ const ul={
 };
 
 const input={
+    fontWeight:'bold',
+    fontStyle:'italic',
+    border:brc,
+    fontSize:fnt,
+    width:900,
     
-    width:942,
 }
 const p={
     
@@ -126,7 +137,7 @@ export function Chatbox(props){
             <div id='user_buttons'>
                 <form onSubmit={submitInput}>
                     <input style={input} id='user_text_box' type='text' placeholder='What is your command?' onChange={e=>setInput(e.target.value)}/>
-                    <input type='submit' /> 
+                    <input style= {button} type='submit' /> 
                 </form>
             </div>
         </div>
