@@ -11,12 +11,12 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.7",
+    "@babel/core": "^7.12.9",
     "@babel/preset-env": "^7.12.1",
     "@babel/preset-react": "^7.12.7",
     "css-loader": "^3.4.2",
     "eslint": "^7.14.0",
-
+    
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-standard": "^16.0.1",
     "eslint-plugin-import": "^2.22.1",
@@ -46,8 +46,8 @@
     "npm": "6.14.6"
   },
   "dependencies": {
-    "@material-ui/core": "^4.11.1",
-    "@material-ui/icons": "^4.9.1",
+    "@material-ui/core": "^4.11.2",
+    "@material-ui/icons": "^4.11.2",
     "babel": "^6.23.0",
     "babel-loader": "^8.2.1",
     "css-loader": "^3.4.2",
