@@ -7,6 +7,7 @@ import {AchievementUI} from './AchievementMenu.jsx'
 import {CreationUI} from './CharCreation.jsx';
 import {Options} from './OptionMenu.jsx';
 import {About} from './AboutUs.jsx';
+import {CharSelection} from './CharSelection.jsx';
 
 const loginElement = document.getElementById('login');
 if(loginElement){
@@ -25,15 +26,20 @@ if(achievementElement){
 
 const uiElement = document.getElementById('main_ui');
 if(uiElement){
-    ReactDOM.render(<MainUI />,  uiElement)
+    ReactDOM.render(<MainUI />,  uiElement);
 }
 
 const optionElement = document.getElementById('options');
 if(optionElement){
-    ReactDOM.render(<Options />, optionElement)
+    ReactDOM.render(<Options />, optionElement);
 }
 
-const landingElement = document.getElementById('about_page')
+const landingElement = document.getElementById('about_page');
 if(landingElement){
-    ReactDOM.render(<About />, landingElement)
+    ReactDOM.render(<About />, landingElement);
+}
+
+const selectionElement = document.getElementById('selectionUI');
+if(selectionElement){
+    ReactDOM.render(<CharSelection />, selectionElement);
 }
