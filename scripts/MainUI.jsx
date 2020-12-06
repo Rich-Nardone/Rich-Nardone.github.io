@@ -9,22 +9,18 @@ import {volu} from './OptionMenu.jsx';
 import {fnt} from './OptionMenu.jsx';
 import {brc} from './OptionMenu.jsx';
 
-
-
 const button={
     fontWeight:'bold',
     fontStyle:'italic',
     width:210,
     border:brc,
     fontSize:fnt,
-}   
+};
 
 export function MainUI(){
-    
     function gotoOptions(){
-        
-        console.log("Heading to Options!")
-        return(window.location = "options.html")
+        console.log("Heading to Options!");
+        return(window.location = "options.html");
     }
     
     return(
@@ -39,6 +35,6 @@ export function MainUI(){
             <InventoryList />
             <Chatbox /> 
             <button style={button} onClick={gotoOptions}>Options</button>
-        </div>     
+         </div>   
     );
 }

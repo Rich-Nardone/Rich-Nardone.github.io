@@ -19,18 +19,22 @@ const h1={
     
 };
 const div={
-    fontSize:fnt,
+    fontSize:20,
     
 };
 const div2={
     border:brc,
     fontSize:fnt,
     background:'grey',
+    display: 'grid',
+    gridTemplateColumns:'1fr 1fr 1fr 1fr',
+    listStyleType: 'none',
 };
 const ul={
     border:brc,
     fontSize:fnt,
     background:'black',
+    textAlign: 'center',
 };
 const BackButton={
     textAlign:'center',
@@ -42,6 +46,9 @@ const BackButton={
     border:brc,
     borderRadius:10,
     fontSize:fnt,
+    position: 'absolute',
+    left:   40,
+    bottom:   40
     
 };
 const ClaimButton={
@@ -58,13 +65,10 @@ const ClaimButton={
 };
 
 function Achievements(){
-    const[title, setTitle] = useState('Click an Achievement to view your progress'); 
-    const[progress, setProgress] = useState('');
     const[achievements, setAchievements] = useState([]);
     
     function returnToMain(){
-        
-        return(window.location = "main_chat.html")
+        return(window.location = "main_chat.html");
     }
     
     function retrieve_achievement(){
@@ -82,8 +86,8 @@ function Achievements(){
     );
     function format_achievement(array){
         const r = (
-               <details key={array[0]} style= {div}>
-                    <summary >{array[1]}</summary>
+               <details key={array[0]+"wrap"} style= {div}>
+                    <summary >{array[1]}     {array[3]}/{array[4]}</summary>
                     <p >{array[2]}</p>
                     <br></br>
                     <label  >Progress: {array[3]}/{array[4]}</label>
@@ -103,8 +107,10 @@ function Achievements(){
     }
     function handleClick(event){
         event.preventDefault();
-        console.log('Setting stats for the achievement '+event.target.id);
-        alert('you win a new car. get off your goat.');
+        console.log('Getting reward completing the achievement '+event.target.id);
+        Socket.emit('get reward', {'id':event.target.id});
+        document.getElementById(event.target.id).disabled =true;
+        retrieve_achievement();
     }
     retrieve_achievement();
     return(
@@ -115,8 +121,6 @@ function Achievements(){
                     volume='50'
                 />
                 <h1 style={h1}>Achievement Menu</h1>
-                <h2> { title } </h2>
-                <h3> { progress } </h3>
                 <ul style={div2}>
                     {display_achievements}
                 </ul>

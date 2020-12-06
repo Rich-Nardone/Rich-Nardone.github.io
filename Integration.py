@@ -63,12 +63,15 @@ def google_login(data):
         user = models.username(email=em)
         db.session.add(user)
         db.session.commit()
+        init_achievements(em)
     userid = db.session.query(models.username).filter_by(email=em).first()
     userlist.append(userid.id)
-
+    
     #Used to distinguish users, for database user calls 
     flask.session["user_id"] = em
     idlist.append(em)
+    
+    
     #check if user has character
     socketio.emit("has character", False)
 
@@ -177,13 +180,11 @@ def update_achievements(key):
         email = db.session.query(models.username).filter_by(id=USER).first()
         userid = email.id
         a_info = (db.session.query(models.achievements).filter_by(user_id=userid).first())
-        if(a_info.items < a_info.item_f):
-            hold = int(a_info.items)+1
-            a_info.items = str(hold)
+        a_info.items = str(int(a_info.items)+1)
+        db.session.commit()
+        if(a_info.items == a_info.item_f):
+            a_info.item_prize = '1'
             db.session.commit()
-            if(a_info.items == a_info.item_f):
-                a_info.item_prize = '1'
-                db.session.commit()
     elif(key == 'win'):
         pass
     elif(key == 'damage'):
@@ -191,10 +192,10 @@ def update_achievements(key):
     elif(key == 'money'):
         pass
     
-def init_achievements():
-    USER = userlist[-1]
-    email = db.session.query(models.username).filter_by(id=USER).first()
-    userid = email.id
+def init_achievements(em):
+    user = db.session.query(models.username).filter_by(email=em).first()
+    userid = user.id
+    db.session.commit()
     achievements = models.achievements(
         user_id=userid,
         win_id='wins',
@@ -267,7 +268,28 @@ def get_achievement():
         ]
     ]
     socketio.emit('achievement', achievement)
-    
+
+
+def send_reward():
+   return 0 
+
+@socketio.on("get reward")
+def get_reward(data):
+    USER = userlist[-1]
+    email = db.session.query(models.username).filter_by(id=USER).first()
+    userid = email.id
+    a_info = (db.session.query(models.achievements).filter_by(user_id=userid).first())
+    if(data["id"]=="items"):
+        a_info.item_prize = '0'
+        a_info.item_f = str(int(a_info.item_f)*2)
+        db.session.commit()
+        send_reward()
+    elif(data["id"]=="win"):
+        pass
+    elif(data["id"]=="damage"):
+        pass
+    elif(data["id"]=="money"):
+        pass
 # ======================================================================================
 @app.route("/")
 def about():
