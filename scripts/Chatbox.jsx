@@ -74,6 +74,7 @@ const details={
     textAlign:'center',
     fontStyle:'italic',
     fontSize:fnt,
+    background:'grey',
 }
 
 const body={
@@ -83,9 +84,11 @@ const body={
 
 export function Chatbox(props){
     const [userInput, setInput] = useState("");
-    const[money,setMoney] = useState(1000);
+    const [money,setMoney] = useState(1000);
+    const [shop,setShop] = useState([]);
     const [chatlog, setChatlog] = useState([]); 
-    
+    const [item,setItem] = useState([]);
+
     function retrieve_player_chatlog(){
         useEffect(()=>{
             Socket.emit('get chatlog');
@@ -94,7 +97,15 @@ export function Chatbox(props){
             });
         }, []);    
     }
-    
+    function retrieve_player_shop(){
+        useEffect(()=>{
+        Socket.emit('get shop');
+            Socket.on('user shop', (data)=>{
+                setShop(data["shop"]);
+                setMoney(data["money"]);
+            });
+        }, []);
+    }
     function submitInput(event){
         event.preventDefault();
         Socket.emit('user input', {'input': userInput});
@@ -103,18 +114,26 @@ export function Chatbox(props){
     const display_log = chatlog.map((log,index)=>
         <li key={index}> {log} </li>
     );
-    
-    function submitPayment(){
-        if(money===0){
-            setMoney(0)
+    const display_items = shop.map((item,index)=>
+        <li key = {index}>
+            <input type="radio" name="item" id={item[0]} value={item[1]} onChange={e=>setItem([e.target.id,e.target.value])} />
+            <label >{item[0]}     Cost: ${item[1]}</label>
+        </li>
+    );
+    function submitPayment(event){
+        event.preventDefault();
+        console.log(item[1])
+        if(money < item[1]){
+            console.log('ouch')
         }
         else{
-        setMoney(money-500)
-        Socket.emit('item purchased')
+            setMoney(money-item[1]);
+            Socket.emit('item purchased', {'item':item[0],'cost':item[1]});
         }
     }
     
     retrieve_player_chatlog();
+    retrieve_player_shop();
     return(
         <div style={div}>
             <div id='chatbox'>
@@ -123,15 +142,15 @@ export function Chatbox(props){
                 </ul>
             </div> 
             <p style={p}>{'Possible Actions: "Say", "Do", "Attack"'}</p>
-            <details>
+            <details  style={secret_p}>
                 <summary style={details}>Pssst..click me for goods</summary>
-                <body style={body}>
-                <p style={secret_p}> {"Welcome to Ghosty's Emporium! What can I get ye?"}</p>
+                <p style={secret_p}> "Welcome to Ghosty's Emporium! What can I get ye?"</p>
                 <p style={secret_p}>Current Money: {money} Bucks</p>
                 <br></br>
-                <button id='Health' onClick={submitPayment}>Health Pack: 500 Bucks</button>
-                </body>
-                
+                <form onSubmit={submitPayment}>
+                    <ul> {display_items} </ul>
+                    <input type="submit" value="Submit" />
+                </form>
             </details>
             <br></br>
             <div id='user_buttons'>

@@ -106,6 +106,4 @@ class achievements(db.Model):
     moneys = db.Column(db.String(400))
     money_f = db.Column(db.String(400))
     money_prize = db.Column(db.String(400))
-    moneys = db.Column(db.String(400))
-    money_f = db.Column(db.String(400))
-    money_prize = db.Column(db.String(400))
+    

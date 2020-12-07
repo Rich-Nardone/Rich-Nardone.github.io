@@ -6,6 +6,7 @@ from os.path import join, dirname
 from settings import db, app, socketio
 from inventory import get_user_inventory, get_asc_inventory, get_dsc_inventory, search_bar, filter_by_type
 from progress import saveProgress, loadProgress
+from achievements import init_achievements, update_achievement, get_achievement_reward, get_all_achievements
 import models
 import flask
 # tests
@@ -125,14 +126,40 @@ def get_chatlog():
             "user attacks, hitting the blob for 10pts"
     ]
     send_chatlog()
+    
+@socketio.on("get shop")
+def get_shop():
+    #TODO get chatlog from database
+    USER = flask.session["user_id"]
+    user= db.session.query(models.username).filter_by(email=USER).first()
+    character = db.session.query(models.character).filter_by(user_id=user.id).first()
+    money = character.money
+    db.session.commit()
+    #DUMMY DATA
+    user_shop={
+            'money': money,
+            'shop': [['car',250],['dog',100]]
+    }
+    send_shop(user_shop)
+
+def send_shop(user_shop):
+    socketio.emit('user shop', user_shop)
 
 # Test atm for the shop
 @socketio.on("item purchased")
-def item_purchased():
+def item_purchased(data):
     """ Purchase item """
-    global item
-    item = 1
-    player_info()
+    cost = data['cost']
+    item = data['item']
+    print(item)
+    print(cost)
+    USER = flask.session["user_id"]
+    user= db.session.query(models.username).filter_by(email=USER).first()
+    character = db.session.query(models.character).filter_by(user_id=user.id).first()
+    character.money = character.money - int(cost)
+    money = character.money 
+    db.session.commit()
+    # player_info()
     update_achievements('item')
     
 
@@ -174,100 +201,15 @@ def character_creation(data):
     db.session.commit()
 
 
-def update_achievements(key):
-    if(key == 'item'):
-        USER = userlist[-1]
-        email = db.session.query(models.username).filter_by(id=USER).first()
-        userid = email.id
-        a_info = (db.session.query(models.achievements).filter_by(user_id=userid).first())
-        a_info.items = str(int(a_info.items)+1)
-        db.session.commit()
-        if(a_info.items == a_info.item_f):
-            a_info.item_prize = '1'
-            db.session.commit()
-    elif(key == 'win'):
-        pass
-    elif(key == 'damage'):
-        pass
-    elif(key == 'money'):
-        pass
+def update_achievements(key,num=1):
+    update_achievement(flask.session["user_id"],key,num)
     
-def init_achievements(em):
-    user = db.session.query(models.username).filter_by(email=em).first()
-    userid = user.id
-    db.session.commit()
-    achievements = models.achievements(
-        user_id=userid,
-        win_id='wins',
-        win_title='King of the land',
-        win_description='Reach the final end state three times to claim your custom prize.',
-        wins='0',
-        win_f='3',
-        win_prize = '0',
-        damage_id = 'damage',
-        damage_title = 'Soul Seeker',
-        damage_description = 'Deal damage to your oppenents in battle. Deal 300 points of damage to claim a valueable reward.',
-        damage_dealt = '0',
-        damage_f = '300',
-        damage_prize = '0',
-        items_id = 'items',
-        item_title = 'Living Lavish',
-        item_description = 'Find items around the map or buy items from the shop. Obtain 2 items to claim a valueable reward.',
-        items = '0',
-        item_f = '2',
-        item_prize = '0',
-        money_id = 'money',
-        money_title = 'Money Laundering',
-        money_description = 'Be on the look out for money. Collect $20 to claim a valueable reward.',
-        moneys = '0',
-        money_f = '20',
-        money_prize = '0'
-    )
-    db.session.add(achievements)
-    db.session.commit()
     
 @socketio.on("get achievements")
-def get_achievement():
+def get_achievements():
     """ get achievements """
-    USER = userlist[-1]
-    email = db.session.query(models.username).filter_by(id=USER).first()
-    userid = email.id
-    a_info = (db.session.query(models.achievements).filter_by(user_id=userid).first())
-    achievement=[
-        [
-            a_info.win_id,
-            a_info.win_title,
-            a_info.win_description,
-            a_info.wins,
-            a_info.win_f,
-            a_info.win_prize
-        ],
-        [
-            a_info.damage_id,
-            a_info.damage_title,
-            a_info.damage_description,
-            a_info.damage_dealt,
-            a_info.damage_f,
-            a_info.damage_prize
-        ],
-        [
-            a_info.items_id,
-            a_info.item_title,
-            a_info.item_description,
-            a_info.items,
-            a_info.item_f,
-            a_info.item_prize
-        ],
-        [
-            a_info.money_id,
-            a_info.money_title,
-            a_info.money_description,
-            a_info.moneys,
-            a_info.money_f,
-            a_info.money_prize
-        ]
-    ]
-    socketio.emit('achievement', achievement)
+    achievements = get_all_achievements(flask.session["user_id"])
+    socketio.emit('achievement', achievements)
 
 
 def send_reward():
@@ -275,21 +217,9 @@ def send_reward():
 
 @socketio.on("get reward")
 def get_reward(data):
-    USER = userlist[-1]
-    email = db.session.query(models.username).filter_by(id=USER).first()
-    userid = email.id
-    a_info = (db.session.query(models.achievements).filter_by(user_id=userid).first())
-    if(data["id"]=="items"):
-        a_info.item_prize = '0'
-        a_info.item_f = str(int(a_info.item_f)*2)
-        db.session.commit()
-        send_reward()
-    elif(data["id"]=="win"):
-        pass
-    elif(data["id"]=="damage"):
-        pass
-    elif(data["id"]=="money"):
-        pass
+    get_achievement_reward(flask.session["user_id"],data["id"])
+    send_reward()
+    
 # ======================================================================================
 @app.route("/")
 def about():
