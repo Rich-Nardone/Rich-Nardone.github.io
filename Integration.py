@@ -7,17 +7,15 @@ from settings import db, app, socketio
 from inventory import get_user_inventory, get_asc_inventory, get_dsc_inventory, search_bar, filter_by_type
 from progress import saveProgress, loadProgress
 from achievements import init_achievements, update_achievement, get_achievement_reward, get_all_achievements
+from user_controller import User
 import models
 import flask
-# tests
-
 # game logic
 import game.game
 import game.game_io
 from game.game import game
 from game.game_io import deconstruct_player
 from game.player import Player
-
 
 # For shop, checks if item has been purchased.
 item = 0
@@ -52,6 +50,10 @@ def player_info():
 userlist = [1]
 idlist = [""]
 
+def create_user_controller(email): 
+    userObj = User(email)
+    flask.session["userObj"] = userObj
+
 @socketio.on("google login")
 def google_login(data):
     """ Google Login """
@@ -69,12 +71,43 @@ def google_login(data):
     userlist.append(userid.id)
     
     #Used to distinguish users, for database user calls 
+    create_user_controller(em)
     flask.session["user_id"] = em
     idlist.append(em)
     
-    
     #check if user has character
-    socketio.emit("has character", False)
+    userObj = flask.session["userObj"]
+    response = {}
+    
+    if userObj.user_exists(): 
+        if userObj.character_counter > 0: 
+            response["has_character"] = True
+        else: 
+            response["has_character"] = False
+    else: 
+        response["has_character"] = False
+        
+    socketio.emit("google login response", response)
+    
+@socketio.on("email login")
+def email_login(data):
+    print(data)
+    create_user_controller(data)
+    
+    userObj = flask.session["userObj"]
+    response = {}
+    
+    if userObj.user_exists(): 
+        response["user_exists"] = True
+        if userObj.character_counter > 0: 
+            response["has_character"] = True
+        else: 
+            response["has_character"] = False
+    else: 
+        response["user_exists"] = False
+        response["has_character"] = False
+        
+    socketio.emit("email exists", response)
 
 def send_party(): 
     #TODO get party from database 
@@ -94,6 +127,13 @@ def send_chatlog():
     ]
     socketio.emit('user chatlog', user_chatlog)
 
+@socketio.on("choosen character")
+def character_selected(data):
+    print("id selection" + str(data))
+    if "userObj" in flask.session: 
+        userObj=flask.session["userObj"]
+        userObj.char_select(data)
+        print(userObj.selected_character_id)
 
 @socketio.on("user input")
 def parse_user_input(data):
@@ -157,12 +197,19 @@ def item_purchased(data):
     user= db.session.query(models.username).filter_by(email=USER).first()
     character = db.session.query(models.character).filter_by(user_id=user.id).first()
     character.money = character.money - int(cost)
-    money = character.money 
     db.session.commit()
-    # player_info()
+    player_info()
     update_achievements('item')
-    
 
+@socketio.on("get user characters")
+def user_chars():
+    print("landed")
+    characters={}
+    userObj = flask.session["userObj"]
+    characters["char_instance"] = userObj.get_characters()
+    print(characters)
+    socketio.emit("recieve user characters", characters)
+    
 @socketio.on("user new character")
 def character_creation(data):
     """ Create character """
