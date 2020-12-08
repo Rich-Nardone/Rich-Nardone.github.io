@@ -27,8 +27,11 @@ const div2={
     fontSize:fnt,
     background:'grey',
     display: 'grid',
-    gridTemplateColumns:'1fr 1fr 1fr 1fr',
+    gridTemplateColumns:'1fr 1fr',
     listStyleType: 'none',
+    padding: 5,
+    margin: 5,
+    border:brc,
 };
 const ul={
     border:brc,
