@@ -5,7 +5,7 @@ import os
 from os.path import join, dirname
 from settings import db, app, socketio
 from inventory import get_user_inventory, get_asc_inventory, get_dsc_inventory, search_bar, filter_by_type
-from progress import saveProgress, loadProgress
+from progress import save_progress, load_progress
 from achievements import init_achievements, update_achievement, get_achievement_reward, get_all_achievements
 from user_controller import User
 import models

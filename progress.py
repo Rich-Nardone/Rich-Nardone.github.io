@@ -9,7 +9,7 @@ from game.game_io import deconstruct_player
 from game.player import Player
 
 #for this funciton work a list of users with most recent ones at the end must be sent
-def saveProgress(userlist):
+def save_progress(userlist):
     """ Saves the user's progress to the database """
     FLAG = "INSERT"
     USER = userlist[-1]
@@ -89,7 +89,7 @@ def saveProgress(userlist):
     else:
         print("weird error")
 #need to send list of users to use function, also this is currnetly incomplete
-def loadProgress(userlist):
+def load_progress(userlist):
     USER=userlist[-1]
     email = db.session.query(models.username).filter_by(id=USER).first()
     key = email.id
