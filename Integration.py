@@ -172,10 +172,10 @@ def get_chatlog():
 @socketio.on("get shop")
 def get_shop():
     userObj = flask.session["userObj"]
-    cid = charlist[-1]
-    char = db.session.query(models.character).filter_by(id=cid).first()
-    money = char.money
+    character = db.session.query(models.character).filter_by(id=userObj.selected_character_id).first()
+    money = character.money
     db.session.commit()
+    flask.session["userObj"] = userObj
     #DUMMY DATA
     user_shop={
             'money': money,
@@ -218,10 +218,11 @@ def item_purchased(data):
     item = data['item']
     print(item)
     print(cost)
-    cid = charlist[-1]
-    character = db.session.query(models.character).filter_by(id=cid).first()
+    userObj = flask.session["userObj"]
+    character = db.session.query(models.character).filter_by(id=userObj.selected_character_id).first()
     character.money = character.money - int(cost)
     db.session.commit()
+    flask.session["userObj"] = userObj
     player_info()
     update_achievements('item')
 
@@ -308,27 +309,8 @@ def about():
 
 
 # =======================================================================================
-
-
-@app.route("/character_selection.html")
-<<<<<<<<< saved version
-
->>>>>>> 822df336c2267b265750322c68ca94af1ad373a3
-# ======================================================================================
-@app.route("/")
-def about():
-    """ main page """
-    return flask.render_template("landing_page.html")
-
-
-# =======================================================================================
-
-
 @app.route("/character_selection.html")
 def choose_char():
-=========
-def char_select():
->>>>>>>>> local version
     """ main page """
     return flask.render_template("character_selection.html")
 
