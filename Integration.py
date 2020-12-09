@@ -120,9 +120,6 @@ def email_login(data):
 
 
 def send_party():
-    # TODO get party from database
-
-    # DUMMY DATA
     user_party = ["player1", "player2", "player10"]
     socketio.emit("user party", user_party)
 
@@ -133,11 +130,6 @@ def send_chatlog(user_chatlog):
 charlist = [1]
 @socketio.on("choosen character")
 def character_selected(data):
-    charlist.append(data)
-    db.session.query(models.charlist).delete()
-    char = models.charlist(char=data)
-    db.session.add(char)
-    db.session.commit()
     if "userObj" in flask.session:
         userObj = flask.session["userObj"]
         userObj.char_select(data)
@@ -163,7 +155,8 @@ def get_party():
 
 @socketio.on("get inventory")
 def get_inventory():
-    inventory = get_user_inventory()
+    userObj = flask.session["userObj"]
+    inventory = userObj.get_inventory()
     send_inventory(inventory)
 
 
@@ -198,10 +191,10 @@ def send_shop(user_shop):
 def game_start():
     player = Player()
     # try to grab player object from db if possible
-    dat = db.session.query(models.username).filter_by(id="1")
-    db.session.commit()
-    print(dat)
-    game(player)
+    userObj = flask.session["userObj"]
+    for x in db.session.query(models.character).filter(models.character.id==userObj.selected_character_id):
+        dat = x
+        game(dat)
 
 
 def get_user_log():
@@ -211,10 +204,10 @@ def send_log(log):
     socketio.emit("user chatlog", log)
 
 def show_log():
-    dump = db.session.query(models.chat_log).filter_by(character_id=charlist[-1])
-    log = []
-    for item in dump:
-        log.append(item.chat)
+    userObj = flask.session["userObj"]
+    print("char select" + str(userObj.selected_character_id))
+    log = userObj.retrive_chatlog()
+    print(log)
     return log
 
 # Test atm for the shop
@@ -240,7 +233,6 @@ def user_chars():
     characters = {}
     userObj = flask.session["userObj"]
     characters["char_instance"] = userObj.get_characters()
-    print(characters)
     socketio.emit("recieve user characters", characters)
 
 
@@ -280,6 +272,13 @@ def character_creation(data):
     )
     db.session.add(dbplayer)
     db.session.commit()
+    userObj = flask.session["userObj"]
+    for x in models.db.session.query(models.character).filter(models.character.user_id == dbplayer.user_id, models.character.character_name == data["name"]):
+        print(x.character_name)
+        print(x.id)
+        userObj.char_select(x.id)
+    flask.session["userObj"] = userObj
+    print("char selected: " + str(userObj.selected_character_id))
     init_achievements(flask.session["userObj"].user_id)
 
 def update_achievements(key,num=1):
@@ -312,7 +311,24 @@ def about():
 
 
 @app.route("/character_selection.html")
+<<<<<<<<< saved version
+
+>>>>>>> 822df336c2267b265750322c68ca94af1ad373a3
+# ======================================================================================
+@app.route("/")
+def about():
+    """ main page """
+    return flask.render_template("landing_page.html")
+
+
+# =======================================================================================
+
+
+@app.route("/character_selection.html")
+def choose_char():
+=========
 def char_select():
+>>>>>>>>> local version
     """ main page """
     return flask.render_template("character_selection.html")
 
