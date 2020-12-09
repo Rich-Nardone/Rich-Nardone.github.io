@@ -96,6 +96,8 @@ export function Chatbox() {
   function listenChatChange(){
     Socket.on('chatlog updated', (data)=>{
       console.log(data);
+      setChatlog(chatlog =>[...chatlog, data['text']])
+      
     });
   }
   
