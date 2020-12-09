@@ -73,6 +73,17 @@ export function Chatbox() {
   const [shop,setShop] = useState([]);
   const [item,setItem] = useState([]);
 
+
+      
+  function retrieve_player_shop(){
+    useEffect(()=>{
+    Socket.emit('get shop');
+        Socket.on('user shop', (data)=>{
+            setShop(data["shop"]);
+            setMoney(data["money"]);
+        });
+    }, []);
+  }
   function retrievePlayerChatlog() {
     useEffect(() => {
       Socket.emit('get chatlog');
@@ -95,7 +106,12 @@ export function Chatbox() {
       {' '}
     </li>
   ));
-
+  const display_items = shop.map((item,index)=>
+      <li key = {index}>
+          <input type="radio" name="item" id={item[0]} value={item[1]} onChange={e=>setItem([e.target.id,e.target.value])} />
+          <label >{item[0]}     Cost: ${item[1]}</label>
+      </li>
+  );
   function submitPayment() {
     if (money === 0) {
       setMoney(0);
@@ -104,8 +120,9 @@ export function Chatbox() {
       Socket.emit('item purchased');
     }
   }
-
+  
   retrievePlayerChatlog();
+  retrieve_player_shop(); 
   return (
     <div style={div}>
       <div id="chatbox">
@@ -131,8 +148,7 @@ export function Chatbox() {
               <ul> {display_items} </ul>
               <input type="submit" value="Submit" />
           </form>
-        <br />
-          <button type="submit" id="Health" onClick={submitPayment}>Health Pack: 500 Bucks</button>
+          <br />
         </body>
 
       </details>
@@ -147,48 +163,4 @@ export function Chatbox() {
   );
 }
 
-export default Chatbox;
 
-<p style={secret_p}>Current Money: {money} Bucks</p>
-                <br></br>
-                <form onSubmit={submitPayment}>
-                    <ul> {display_items} </ul>
-                    <input type="submit" value="Submit" />
-                </form>
-            </details>
-            <br></br>
-            
-            
-            
-            
-           const display_items = shop.map((item,index)=>
-        <li key = {index}>
-            <input type="radio" name="item" id={item[0]} value={item[1]} onChange={e=>setItem([e.target.id,e.target.value])} />
-            <label >{item[0]}     Cost: ${item[1]}</label>
-        </li>
-    );
-    function submitPayment(event){
-        event.preventDefault();
-        console.log(item[1])
-        if(money < item[1]){
-            console.log('ouch')
-        }
-        else{
-            setMoney(money-item[1]);
-            Socket.emit('item purchased', {'item':item[0],'cost':item[1]});
-        }
-    }
-    
-    retrieve_player_chatlog();
-    retrieve_player_shop(); 
-    
-    
-      function retrieve_player_shop(){
-        useEffect(()=>{
-        Socket.emit('get shop');
-            Socket.on('user shop', (data)=>{
-                setShop(data["shop"]);
-                setMoney(data["money"]);
-            });
-        }, []);
-    }
