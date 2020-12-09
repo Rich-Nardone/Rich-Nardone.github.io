@@ -89,8 +89,16 @@ export function Chatbox() {
   function submitInput(event) {
     event.preventDefault();
     Socket.emit('user input', { input: userInput });
+    setChatlog(chatlog =>[...chatlog, userInput])
     document.getElementById('user_text_box').value = '';
   }
+  
+  function listenChatChange(){
+    Socket.on('chatlog updated', (data)=>{
+      console.log(data);
+    });
+  }
+  
   const displayLog = chatlog.map((log, index) => (
     // eslint-disable-next-line react/no-array-index-key
     <li key={index}>
@@ -121,9 +129,14 @@ export function Chatbox() {
       console.log(data);
     });
   }
+  function startGame() {
+    Socket.emit('game start');
+  }
+
   retrievePlayerChatlog();
-  retrievePlayerShop();
   listenChatChange();
+  startGame();
+  retrievePlayerShop();
   return (
     <div style={div}>
       <div id="chatbox">

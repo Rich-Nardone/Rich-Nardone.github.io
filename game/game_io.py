@@ -27,14 +27,13 @@ def prompt_in():
     return text
 
 
-def send_out(msg):
+def send_out(msg, char_id):
     """ Method for sending reply """
-    dbmsg = models.chat_log(
-        user_id = 000,
-        character_id = 000,
-        chat = msg
-    )
     print(msg)
+    socketio.emit("chatlog updated", {"text": msg})
+    dbmsg = models.chat_log(
+        character_id=char_id, # char
+        chat=msg
+    )
     db.session.add(dbmsg)
     db.session.commit()
-    socketio.emit("chatlog updated", {"text": msg})
