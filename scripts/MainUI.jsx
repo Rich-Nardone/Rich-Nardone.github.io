@@ -1,13 +1,11 @@
-import React, {useState, useEffect} from 'react'; 
-import { Chatbox } from './Chatbox.jsx';
-import { InventoryList } from './InventoryList.jsx'; 
-import { PartyList } from './PartyList.jsx';
-import { AchievementButton } from './AchievementButton.jsx';
-import {Socket} from './Socket.jsx';
+import React from 'react';
 import Sound from 'react-sound';
-import {volu} from './OptionMenu.jsx';
-import {fnt} from './OptionMenu.jsx';
-import {brc} from './OptionMenu.jsx';
+import { Chatbox } from './Chatbox';
+import { InventoryList } from './InventoryList';
+import { PartyList } from './PartyList';
+import { Socket } from './Socket';
+import { volu, fnt, brc } from './OptionMenu';
+import { AchievementButton } from './AchievementButton';
 
 const button={
     fontWeight:'bold',
@@ -38,3 +36,5 @@ export function MainUI(){
          </div>   
     );
 }
+
+export default MainUI;

@@ -1,3 +1,7 @@
+"""
+    Display settings, stored in PSQL
+"""
+
 import os
 from os.path import join, dirname
 import flask
@@ -6,10 +10,11 @@ import flask_socketio
 from flask_session import Session
 from flask_session import SqlAlchemySessionInterface
 from dotenv import load_dotenv
-#Holds db and app variables 
+
+# Holds db and app variables
 
 app = flask.Flask(__name__)
-app.config['SESSION_TYPE'] = 'sqlalchemy'
+app.config["SESSION_TYPE"] = "sqlalchemy"
 sess = Session(app)
 
 
