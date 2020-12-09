@@ -187,7 +187,7 @@ def get_shop():
     #DUMMY DATA
     user_shop={
             'money': money,
-            'shop': [['car',250],['dog',100]]
+            'shop': [['Lunch Meat',50],['Large Pencil',20]]
     }
     send_shop(user_shop)
 
@@ -273,7 +273,7 @@ def send_reward():
 
 @socketio.on("get reward")
 def get_reward(data):
-    get_achievement_reward(flask.session["user_id"],data["id"])
+    get_achievement_reward(flask.session["userObj"].user_id,data["id"])
     send_reward()
     
 # ======================================================================================
