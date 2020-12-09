@@ -195,6 +195,7 @@ def game_start():
     player = Player()
     # try to grab player object from db if possible
     dat = db.session.query(models.username).filter_by(id="1")
+    db.session.commit()
     print(dat)
     game(player)
 
@@ -222,7 +223,7 @@ def item_purchased(data):
     print(item)
     print(cost)
     cid = flask.session["userObj"].selected_character_id
-    character = db.session.query(models.character).filter_by(id=cid).first()
+    character = db.session.query(models.character).filter_by(id='1').first()
     character.money = character.money - int(cost)
     db.session.commit()
     player_info()

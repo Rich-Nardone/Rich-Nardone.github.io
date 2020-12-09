@@ -79,11 +79,11 @@ export function Chatbox() {
   }
   function retrievePlayerShop(){
     useEffect(()=>{
-    Socket.emit('get shop');
-        Socket.on('user shop', (data)=>{
-            setShop(data["shop"]);
-            setMoney(data["money"]);
-        });
+      Socket.emit('get shop');
+      Socket.on('user shop', (data)=>{
+          setShop(data["shop"]);
+          setMoney(data["money"]);
+      });
     }, []);
   }
   function submitInput(event) {
@@ -135,8 +135,9 @@ export function Chatbox() {
 
   retrievePlayerChatlog();
   listenChatChange();
-  startGame();
   retrievePlayerShop();
+  startGame();
+ 
   return (
     <div style={div}>
       <div id="chatbox">
@@ -146,7 +147,7 @@ export function Chatbox() {
       </div>
       <p style={p}>Possible Actions: &quot;Say&quot;, &quot;Do&quot;, &quot;Attack&quot;</p>
       <details>
-        <summary style={details} onClick={retrievePlayerShop}>Pssst..click me for goods</summary>
+        <summary style={details}>Pssst..click me for goods</summary>
         <body style={body}>
           <p style={secretP}>
             {' '}
