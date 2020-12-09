@@ -226,7 +226,7 @@ def item_purchased(data):
     print(item)
     print(cost)
     cid = charlist[-1]
-    character = db.session.query(models.character).filter_by(id='1').first()
+    character = db.session.query(models.character).filter_by(id=cid).first()
     character.money = character.money - int(cost)
     db.session.commit()
     player_info()

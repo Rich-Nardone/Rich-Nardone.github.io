@@ -51,14 +51,13 @@ function CharSelection() {
   function handleForm(event) {
     event.preventDefault();
     const character = {
-      id: true,
       name: charName,
       gen: gender,
       classType: charClass,
     };
     console.log('sent to server!');
     console.log(character);
-    Socket.emit('choosen character', character);
+    Socket.emit('user new character', character);
     window.location = 'main_chat.html';
     return window.location;
   }
