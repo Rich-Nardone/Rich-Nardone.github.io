@@ -10,7 +10,6 @@ from settings import db
 
 class username(db.Model):
     """ Stores username from login """
-
     __tablename__ = "username"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(400))

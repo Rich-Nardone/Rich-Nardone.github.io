@@ -73,7 +73,7 @@ def google_login(data):
         user = models.username(email=em)
         db.session.add(user)
         db.session.commit()
-        init_achievements(em)
+        
     userid = db.session.query(models.username).filter_by(email=em).first()
     userlist.append(userid.id)
     
@@ -93,7 +93,6 @@ def google_login(data):
             response["has_character"] = False
     else: 
         response["has_character"] = False
-        
     socketio.emit("google login response", response)
     
 @socketio.on("email login")
@@ -111,7 +110,6 @@ def email_login(data):
             response["has_character"] = False
     else:
         response["has_character"] = False
-
     socketio.emit("email exists", response)
 
 
@@ -137,11 +135,12 @@ def send_chatlog():
 
 @socketio.on("choosen character")
 def character_selected(data):
-    print("id selection" + str(data))
     if "userObj" in flask.session:
         userObj = flask.session["userObj"]
         userObj.char_select(data)
+        flask.session["userObj"] = userObj
         print(userObj.selected_character_id)
+        
 
 
 @socketio.on("user input")
@@ -179,11 +178,10 @@ def get_chatlog():
     
 @socketio.on("get shop")
 def get_shop():
-    #TODO get chatlog from database
-    USER = flask.session["user_id"]
-    user= db.session.query(models.username).filter_by(email=USER).first()
-    character = db.session.query(models.character).filter_by(user_id=user.id).first()
-    money = character.money
+    userObj = flask.session["userObj"]
+    cid = userObj.selected_character_id
+    char = db.session.query(models.character).filter_by(id=cid).first()
+    money = char.money
     db.session.commit()
     #DUMMY DATA
     user_shop={
@@ -204,9 +202,8 @@ def item_purchased(data):
     item = data['item']
     print(item)
     print(cost)
-    USER = flask.session["user_id"]
-    user= db.session.query(models.username).filter_by(email=USER).first()
-    character = db.session.query(models.character).filter_by(user_id=user.id).first()
+    cid = flask.session["userObj"].selected_character_id
+    character = db.session.query(models.character).filter_by(id=cid).first()
     character.money = character.money - int(cost)
     db.session.commit()
     player_info()
@@ -237,11 +234,8 @@ def character_creation(data):
         player.make_bookworm()
     elif data["classType"] == "NEET":
         player.make_neet()
-    USER = userlist[-1]
-    email = db.session.query(models.username).filter_by(id=USER).first()
-    userid = email.id
     dbplayer = models.character(
-        user_id=userid,
+        user_id=flask.session["userObj"].user_id,
         character_class=data["classType"],
         character_name=data["name"],
         gender=data["gen"],
@@ -259,16 +253,17 @@ def character_creation(data):
     )
     db.session.add(dbplayer)
     db.session.commit()
-
+    userObj.char_select(data)
+    init_achievements(flask.session["userObj"].user_id)
 
 def update_achievements(key,num=1):
-    update_achievement(flask.session["user_id"],key,num)
+    update_achievement(flask.session["userObj"].user_id,key,num)
     
     
 @socketio.on("get achievements")
 def get_achievements():
     """ get achievements """
-    achievements = get_all_achievements(flask.session["user_id"])
+    achievements = get_all_achievements(flask.session["userObj"].user_id)
     socketio.emit('achievement', achievements)
 
 

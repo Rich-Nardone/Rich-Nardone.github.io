@@ -72,18 +72,8 @@ export function Chatbox() {
   const [chatlog, setChatlog] = useState([]);
   const [shop,setShop] = useState([]);
   const [item,setItem] = useState([]);
-
-
-      
-  function retrieve_player_shop(){
-    useEffect(()=>{
-    Socket.emit('get shop');
-        Socket.on('user shop', (data)=>{
-            setShop(data["shop"]);
-            setMoney(data["money"]);
-        });
-    }, []);
-  }
+  
+  
   function retrievePlayerChatlog() {
     useEffect(() => {
       Socket.emit('get chatlog');
@@ -92,7 +82,15 @@ export function Chatbox() {
       });
     }, []);
   }
-
+  function retrievePlayerShop(){
+    useEffect(()=>{
+    Socket.emit('get shop');
+        Socket.on('user shop', (data)=>{
+            setShop(data["shop"]);
+            setMoney(data["money"]);
+        });
+    }, []);
+  }
   function submitInput(event) {
     event.preventDefault();
     Socket.emit('user input', { input: userInput });
@@ -112,17 +110,25 @@ export function Chatbox() {
           <label >{item[0]}     Cost: ${item[1]}</label>
       </li>
   );
-  function submitPayment() {
-    if (money === 0) {
-      setMoney(0);
-    } else {
-      setMoney(money - 500);
-      Socket.emit('item purchased');
+  function submitPayment(event){
+        event.preventDefault();
+        console.log(item[1])
+        if(money < item[1]){
+            console.log('ouch')
+        }
+        else{
+            setMoney(money-item[1]);
+            Socket.emit('item purchased', {'item':item[0],'cost':item[1]});
+        }
     }
+  function listenChatChange(){
+    Socket.on('chatlog updated', (data)=>{
+      console.log(data);
+    });
   }
-  
   retrievePlayerChatlog();
-  retrieve_player_shop(); 
+  retrievePlayerShop();
+  listenChatChange();
   return (
     <div style={div}>
       <div id="chatbox">
@@ -132,7 +138,7 @@ export function Chatbox() {
       </div>
       <p style={p}>Possible Actions: &quot;Say&quot;, &quot;Do&quot;, &quot;Attack&quot;</p>
       <details>
-        <summary style={details}>Pssst..click me for goods</summary>
+        <summary style={details} onClick={retrievePlayerShop}>Pssst..click me for goods</summary>
         <body style={body}>
           <p style={secretP}>
             {' '}
@@ -150,7 +156,6 @@ export function Chatbox() {
           </form>
           <br />
         </body>
-
       </details>
       <br />
       <div id="user_buttons">
@@ -164,3 +169,4 @@ export function Chatbox() {
 }
 
 
+export default Chatbox;

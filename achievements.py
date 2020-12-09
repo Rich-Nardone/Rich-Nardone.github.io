@@ -2,12 +2,9 @@ import os
 import models
 from settings import db
 
-def init_achievements(em):
-    user = db.session.query(models.username).filter_by(email=em).first()
-    userid = user.id
-    db.session.commit()
+def init_achievements(uid):
     achievements = models.achievements(
-        user_id=userid,
+        user_id=uid,
         win_id='wins',
         win_title='King of the land',
         win_description='Reach the final end state three times to claim your custom prize.',
@@ -36,9 +33,7 @@ def init_achievements(em):
     db.session.add(achievements)
     db.session.commit()
 
-def get_achievement_reward(USER,a_id):
-    email = db.session.query(models.username).filter_by(email=USER).first()
-    userid = email.id
+def get_achievement_reward(userid,a_id):
     a_info = (db.session.query(models.achievements).filter_by(user_id=userid).first())
     if(a_id=="items"):
         a_info.item_prize = '0'
@@ -54,10 +49,8 @@ def get_achievement_reward(USER,a_id):
         a_info.money_f = str(int(a_info.item_f)*2)
     db.session.commit()
     
-def get_all_achievements(USER):
-    email = db.session.query(models.username).filter_by(email=USER).first()
-    userid = email.id
-    a_info = (db.session.query(models.achievements).filter_by(user_id=userid).first())
+def get_all_achievements(userid):
+    a_info = db.session.query(models.achievements).filter_by(user_id=userid).first()
     achievements=[
         [
             a_info.win_id,
@@ -94,9 +87,7 @@ def get_all_achievements(USER):
     ]
     return achievements
     
-def update_achievement(USER,key,num):
-    email = db.session.query(models.username).filter_by(email=USER).first()
-    userid = email.id
+def update_achievement(userid,key,num):
     a_info = (db.session.query(models.achievements).filter_by(user_id=userid).first())
     if(key == 'item'):
         a_info.items = str(int(a_info.items)+num)
