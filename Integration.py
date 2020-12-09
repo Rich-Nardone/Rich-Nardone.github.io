@@ -17,6 +17,7 @@ from achievements import (
     get_achievement_reward, 
     get_all_achievements
 )
+
 from user_controller import User
 import models
 
@@ -253,7 +254,7 @@ def character_creation(data):
     )
     db.session.add(dbplayer)
     db.session.commit()
-    userObj.char_select(data)
+    #userObj.char_select(data)
     init_achievements(flask.session["userObj"].user_id)
 
 def update_achievements(key,num=1):

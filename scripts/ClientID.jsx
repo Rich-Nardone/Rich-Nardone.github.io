@@ -1,7 +1,2 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-
-let ClientID = "441337686833-afmhrf35a9l72dui53r94ggtgja42me3.apps.googleusercontent.com"
-
-export {ClientID};
+const ClientID = '872220304538-tqoo6mhtqjk4fib1de96gkglrdeupmbj.apps.googleusercontent.com';
 

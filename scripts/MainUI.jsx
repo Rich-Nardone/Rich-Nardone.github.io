@@ -7,13 +7,18 @@ import { Socket } from './Socket';
 import { volu, fnt, brc } from './OptionMenu';
 import { AchievementButton } from './AchievementButton';
 
-const button={
-    fontWeight:'bold',
-    fontStyle:'italic',
-    width:210,
-    border:brc,
-    fontSize:fnt,
+const button = {
+  position: 'relative',
+  fontWeight: 'bold',
+  fontStyle: 'italic',
+  width: 210,
+  border: brc,
+  fontSize: fnt,
+  top: 300,
+  borderRadius: 10,
+  top: 300,
 };
+
 
 export function MainUI(){
     function gotoOptions(){
@@ -24,9 +29,9 @@ export function MainUI(){
     return(
         <div>
             <Sound
-                    url='static/MainChatTheme.mp3'
-                    playStatus={Sound.status.PLAYING}
-                    volume={volu}
+                url="static/MainUIMusic.mp3"
+                playStatus={Sound.status.PLAYING}
+                volume={volu}
             />
             <AchievementButton />
             <PartyList /> 
@@ -36,5 +41,4 @@ export function MainUI(){
          </div>   
     );
 }
-
 export default MainUI;
