@@ -134,6 +134,10 @@ charlist = [1]
 @socketio.on("choosen character")
 def character_selected(data):
     charlist.append(data)
+    db.session.query(models.charlist).delete()
+    char = models.charlist(char=data)
+    db.session.add(char)
+    db.session.commit()
     if "userObj" in flask.session:
         userObj = flask.session["userObj"]
         userObj.char_select(data)
@@ -146,7 +150,7 @@ def character_selected(data):
 def parse_user_input(data):
     """ Parse user inputs in order to interact with game logic """
     message = data["input"]
-    chat = models.chat_log(chat=message,character_id="1")
+    chat = models.chat_log(chat=message,character_id=charlist[-1])
     db.session.add(chat)
     db.session.commit()
     user_in.update(data["input"])
@@ -175,7 +179,7 @@ def get_chatlog():
 @socketio.on("get shop")
 def get_shop():
     userObj = flask.session["userObj"]
-    cid = userObj.selected_character_id
+    cid = charlist[-1]
     char = db.session.query(models.character).filter_by(id=cid).first()
     money = char.money
     db.session.commit()
@@ -207,11 +211,10 @@ def send_log(log):
     socketio.emit("user chatlog", log)
 
 def show_log():
-    dump = db.session.query(models.chat_log).filter_by(character_id="1")
+    dump = db.session.query(models.chat_log).filter_by(character_id=charlist[-1])
     log = []
     for item in dump:
         log.append(item.chat)
-    print(charlist[-1])
     return log
 
 # Test atm for the shop
@@ -222,7 +225,7 @@ def item_purchased(data):
     item = data['item']
     print(item)
     print(cost)
-    cid = flask.session["userObj"].selected_character_id
+    cid = charlist[-1]
     character = db.session.query(models.character).filter_by(id='1').first()
     character.money = character.money - int(cost)
     db.session.commit()

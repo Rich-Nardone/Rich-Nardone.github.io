@@ -116,4 +116,8 @@ class achievements(db.Model):
     moneys = db.Column(db.String(400))
     money_f = db.Column(db.String(400))
     money_prize = db.Column(db.String(400))
-    
+
+class charlist(db.Model):
+    __tablename__ = "charlist"
+    id = db.Column(db.Integer, primary_key=True)
+    char = db.Column(db.Integer)
