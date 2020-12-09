@@ -1,4 +1,3 @@
-
 """
     A class for users which streamlines player object retrieval
 """
@@ -55,12 +54,3 @@ class User:
         ):
             inventory_list.append(x.items)
         return inventory_list
-    
-    def retrive_chatlog(self):
-        chat_msg = []
-        for x in models.db.session.query(models.chat_log.chat).filter(
-            models.chat_log.character_id == self.selected_character_id
-        ): 
-                chat_msg.append(x)
-        return chat_msg
-        

@@ -3,35 +3,37 @@ import models
 from settings import db
 
 def init_achievements(uid):
-    achievements = models.achievements(
-        user_id=uid,
-        win_id='wins',
-        win_title='King of the land',
-        win_description='Reach the final end state three times to claim your custom prize.',
-        wins='0',
-        win_f='3',
-        win_prize = '0',
-        damage_id = 'damage',
-        damage_title = 'Soul Seeker',
-        damage_description = 'Deal damage to your oppenents in battle. Deal 300 points of damage to claim a valueable reward.',
-        damage_dealt = '0',
-        damage_f = '300',
-        damage_prize = '0',
-        items_id = 'items',
-        item_title = 'Living Lavish',
-        item_description = 'Find items around the map or buy items from the shop. Obtain 2 items to claim a valueable reward.',
-        items = '0',
-        item_f = '2',
-        item_prize = '0',
-        money_id = 'money',
-        money_title = 'Money Laundering',
-        money_description = 'Be on the look out for money. Collect $20 to claim a valueable reward.',
-        moneys = '0',
-        money_f = '20',
-        money_prize = '0'
-    )
-    db.session.add(achievements)
-    db.session.commit()
+    all_user = [user.user_id for user in db.session.query(models.achievements).all()]
+    if uid not in all_user:
+        achievements = models.achievements(
+            user_id=uid,
+            win_id='wins',
+            win_title='King of the land',
+            win_description='Reach the final end state three times to claim your custom prize.',
+            wins='0',
+            win_f='3',
+            win_prize = '0',
+            damage_id = 'damage',
+            damage_title = 'Soul Seeker',
+            damage_description = 'Deal damage to your oppenents in battle. Deal 300 points of damage to claim a valueable reward.',
+            damage_dealt = '0',
+            damage_f = '300',
+            damage_prize = '0',
+            items_id = 'items',
+            item_title = 'Living Lavish',
+            item_description = 'Find items around the map or buy items from the shop. Obtain 2 items to claim a valueable reward.',
+            items = '0',
+            item_f = '2',
+            item_prize = '0',
+            money_id = 'money',
+            money_title = 'Money Laundering',
+            money_description = 'Be on the look out for money. Collect $20 to claim a valueable reward.',
+            moneys = '0',
+            money_f = '20',
+            money_prize = '0'
+        )
+        db.session.add(achievements)
+        db.session.commit()
 
 def get_achievement_reward(userid,a_id):
     a_info = (db.session.query(models.achievements).filter_by(user_id=userid).first())

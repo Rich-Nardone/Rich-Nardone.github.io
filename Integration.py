@@ -60,7 +60,9 @@ idlist = [""]
 
 def create_user_controller(email): 
     userObj = User(email)
+    print(email)
     flask.session["userObj"] = userObj
+
 
 @socketio.on("google login")
 def google_login(data):
@@ -209,6 +211,7 @@ def item_purchased(data):
     db.session.commit()
     player_info()
     update_achievements('item')
+
 
 
 @socketio.on("get user characters")
