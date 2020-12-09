@@ -11,8 +11,8 @@ import sys
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
-from progress import save_progress
-from settings import socketio
+from Integration import save_progress
+from Integration import socketio
 import user_input
 
 user_in = user_input.UserInput()
