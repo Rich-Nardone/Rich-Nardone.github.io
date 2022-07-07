@@ -322,6 +322,17 @@ def choose_char():
 def index():
     """ main page """
     create_user_controller('Carmen')
+    userObj = flask.session["userObj"]
+    response = {}
+    
+    if userObj.user_exists():
+        if userObj.character_counter > 0:
+            response["has_character"] = True
+        else:
+            response["has_character"] = False
+    else:
+        response["has_character"] = False
+    socketio.emit("email exists", response)
     return flask.render_template("character_creation.html")
 
 
