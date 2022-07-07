@@ -8,10 +8,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from settings import db
 
-
 class username(db.Model):
     """ Stores username from login """
-
     __tablename__ = "username"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(400))
@@ -88,6 +86,36 @@ class chat_log(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     character_id = db.Column(db.Integer, db.ForeignKey("character.id"))
     chat = db.Column(db.String(1000))
+
+class achievements(db.Model):
+    """ Stores users achievements info """
+    __tablename__ = 'achievements'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("username.id"))
+    win_id = db.Column(db.String(400))
+    win_title = db.Column(db.String(400))
+    win_description = db.Column(db.String(400))
+    wins = db.Column(db.String(400))
+    win_f = db.Column(db.String(400))
+    win_prize = db.Column(db.String(400))
+    damage_id = db.Column(db.String(400))
+    damage_title = db.Column(db.String(400))
+    damage_description = db.Column(db.String(400))
+    damage_dealt = db.Column(db.String(400))
+    damage_f = db.Column(db.String(400))
+    damage_prize = db.Column(db.String(400))
+    items_id = db.Column(db.String(400))
+    item_title = db.Column(db.String(400))
+    item_description = db.Column(db.String(400))
+    items = db.Column(db.String(400))
+    item_f = db.Column(db.String(400))
+    item_prize = db.Column(db.String(400))
+    money_id = db.Column(db.String(400))
+    money_title = db.Column(db.String(400))
+    money_description = db.Column(db.String(400))
+    moneys = db.Column(db.String(400))
+    money_f = db.Column(db.String(400))
+    money_prize = db.Column(db.String(400))
 
 class charlist(db.Model):
     __tablename__ = "charlist"

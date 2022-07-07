@@ -7,6 +7,7 @@ import { CreationUI } from './CharCreation';
 import { Options } from './OptionMenu';
 import { About } from './AboutUs';
 import { CharSelection } from './CharSelection';
+import { AchievementUI } from './AchievementMenu';
 
 const loginElement = document.getElementById('login');
 if (loginElement) {
@@ -16,6 +17,11 @@ if (loginElement) {
 const creationElement = document.getElementById('create_ui');
 if (creationElement) {
   ReactDOM.render(<CreationUI />, creationElement);
+}
+
+const achievementElement = document.getElementById('achievement_ui');
+if(achievementElement){
+    ReactDOM.render(<AchievementUI />, document.getElementById('achievement_ui'));
 }
 
 const uiElement = document.getElementById('main_ui');

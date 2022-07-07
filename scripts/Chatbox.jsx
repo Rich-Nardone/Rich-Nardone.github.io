@@ -23,26 +23,32 @@ const ul = {
   fontStyle: 'italic',
   fontWeight: 'bold',
   fontSize: fnt,
-
 };
-
-const input = {
-
-  width: 942,
+const input={
+    fontWeight:'bold',
+    fontStyle:'italic',
+    border:brc,
+    fontSize:fnt,
+    width:900,
 };
-const p = {
-
-  padding: 0,
-  margin: 0,
-  position: 'relative',
-  border: brc,
-  fontWeight: 'bold',
-  textAlign: 'center',
-  opacity: 0.5,
-  fontStyle: 'italic',
-
-};
-
+const p={
+    
+    padding:0,
+    margin:0,
+    position: 'relative',
+    border:brc,
+    fontWeight:'bold',
+    textAlign:'center',
+    opacity: 0.5,
+    fontStyle:'italic',
+}
+const details={
+    fontWeight:'bold',
+    textAlign:'center',
+    fontStyle:'italic',
+    fontSize:fnt,
+    background:'grey',
+}
 const secretP = {
   textAlign: 'center',
   fontWeight: 'bold',
@@ -51,14 +57,6 @@ const secretP = {
   fontSize: fnt,
 
 };
-
-const details = {
-  fontWeight: 'bold',
-  textAlign: 'center',
-  fontStyle: 'italic',
-  fontSize: fnt,
-};
-
 const body = {
   background: 'grey',
 };
@@ -67,7 +65,10 @@ export function Chatbox() {
   const [userInput, setInput] = useState('');
   const [money, setMoney] = useState(1000);
   const [chatlog, setChatlog] = useState([]);
-
+  const [shop,setShop] = useState([]);
+  const [item,setItem] = useState([]);
+  
+  
   function retrievePlayerChatlog() {
     useEffect(() => {
       Socket.emit('get chatlog');
@@ -76,7 +77,15 @@ export function Chatbox() {
       });
     }, []);
   }
-
+  function retrievePlayerShop(){
+    useEffect(()=>{
+      Socket.emit('get shop');
+      Socket.on('user shop', (data)=>{
+          setShop(data["shop"]);
+          setMoney(data["money"]);
+      });
+    }, []);
+  }
   function submitInput(event) {
     event.preventDefault();
     Socket.emit('user input', { input: userInput });
@@ -87,6 +96,8 @@ export function Chatbox() {
   function listenChatChange(){
     Socket.on('chatlog updated', (data)=>{
       console.log(data);
+      setChatlog(chatlog =>[...chatlog, data['text']])
+      
     });
   }
   
@@ -98,23 +109,37 @@ export function Chatbox() {
       {' '}
     </li>
   ));
-
-  function submitPayment() {
-    if (money === 0) {
-      setMoney(0);
-    } else {
-      setMoney(money - 500);
-      Socket.emit('item purchased');
+  const display_items = shop.map((item,index)=>
+      <li key = {index}>
+          <input type="radio" name="item" id={item[0]} value={item[1]} onChange={e=>setItem([e.target.id,e.target.value])} />
+          <label >{item[0]}     Cost: ${item[1]}</label>
+      </li>
+  );
+  function submitPayment(event){
+        event.preventDefault();
+        console.log(item[1])
+        if(money < item[1]){
+            console.log('ouch')
+        }
+        else{
+            setMoney(money-item[1]);
+            Socket.emit('item purchased', {'item':item[0],'cost':item[1]});
+        }
     }
+  function listenChatChange(){
+    Socket.on('chatlog updated', (data)=>{
+      console.log(data);
+    });
   }
-
   function startGame() {
     Socket.emit('game start');
   }
 
   retrievePlayerChatlog();
   listenChatChange();
+  retrievePlayerShop();
   startGame();
+ 
   return (
     <div style={div}>
       <div id="chatbox">
@@ -136,10 +161,12 @@ export function Chatbox() {
             {' '}
             Bucks
           </p>
+          <form onSubmit={submitPayment}>
+              <ul> {display_items} </ul>
+              <input type="submit" value="Submit" />
+          </form>
           <br />
-          <button type="submit" id="Health" onClick={submitPayment}>Health Pack: 500 Bucks</button>
         </body>
-
       </details>
       <br />
       <div id="user_buttons">
@@ -151,5 +178,6 @@ export function Chatbox() {
     </div>
   );
 }
+
 
 export default Chatbox;
