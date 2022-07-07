@@ -11,7 +11,6 @@ cffi==1.14.3
 chardet==3.0.4
 click==7.1.2
 colorama==0.4.3
-contextvars==2.4
 dataclasses==0.7
 db==0.1.1
 db.py==0.5.3
