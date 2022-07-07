@@ -322,7 +322,6 @@ def choose_char():
 def index():
     """ main page """
     create_user_controller('Carmen')
-    userObj = flask.session["userObj"]
     response = {}
     
     if userObj.user_exists():
