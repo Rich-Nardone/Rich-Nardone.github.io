@@ -321,7 +321,7 @@ def choose_char():
 @app.route("/login.html")
 def index():
     """ main page """
-    return flask.render_template("index.html")
+    return flask.render_template("character_creation.html")
 
 
 # ======================================================================================
