@@ -53,7 +53,7 @@ export function GoogleLoginButton() {
 
   return (
     <GoogleLogin
-      clientId={ClientID}
+      clientId={"243562911937-h7p2bj6d4p5hqc23h1dqh6o0ukaicdhg.apps.googleusercontent.com"}
       render={(renderProps) => (
         <button type="submit" onClick={renderProps.onClick} style={logStyle}>Newcomer? Enter if you dare...</button>
       )}
@@ -71,7 +71,7 @@ export function GoogleLoginButton() {
 export function GoogleLogoutButton() {
   return (
     <GoogleLogout
-      clientId={ClientID}
+      clientId={"243562911937-h7p2bj6d4p5hqc23h1dqh6o0ukaicdhg.apps.googleusercontent.com"}
       buttonText="Logout"
       onLogoutSuccess={handleLogoutSuccess}
       onFailure={handleLogoutFail}
